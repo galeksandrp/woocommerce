@@ -116,6 +116,8 @@ class Woo_Tracks_Event {
 		if ( is_wp_error( $validated ) )
 			return '';
 
+		print_r( $validated );
+
 		return Woo_Tracks_Client::PIXEL . '?' . http_build_query( $validated );
 	}
 

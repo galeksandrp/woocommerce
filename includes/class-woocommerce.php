@@ -394,6 +394,10 @@ final class WooCommerce {
 			include_once WC_ABSPATH . 'includes/class-wc-tracker.php';
 		}
 
+		if ( $this->is_request( 'admin' ) && 'yes' === get_option( 'woocommerce_allow_tracking', 'no' ) ) {
+			include_once WC_ABSPATH . 'includes/class-wc-user-tracking.php';
+		}
+
 		$this->theme_support_includes();
 		$this->query = new WC_Query();
 		$this->api   = new WC_API();

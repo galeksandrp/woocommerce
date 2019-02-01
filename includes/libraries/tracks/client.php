@@ -23,10 +23,9 @@ require_once( dirname(__FILE__) . '/class.tracks-client.php' );
  * @param $identity WP_user object
  * @param string $event_name The name of the event
  * @param array $properties Custom properties to send with the event
- * @param int $event_timestamp_millis The time in millis since 1970-01-01 00:00:00 when the event occurred
  * @return \Woo_Tracks_Event|\WP_Error
  */
-function woo_tracks_build_event_obj( $user, $event_name, $properties = array(), $event_timestamp_millis = false ) {
+function woo_tracks_build_event_obj( $user, $event_name, $properties = array() ) {
 
 	$identity = woo_tracks_get_identity( $user->ID );
 
@@ -36,7 +35,7 @@ function woo_tracks_build_event_obj( $user, $event_name, $properties = array(), 
 		'blog_lang' => isset( $properties['blog_lang'] ) ? $properties['blog_lang'] : get_bloginfo( 'language' )
 	);
 
-	$timestamp = ( $event_timestamp_millis !== false ) ? $event_timestamp_millis : round( microtime( true ) * 1000 );
+	$timestamp = round( microtime( true ) * 1000 );
 	$timestamp_string = is_string( $timestamp ) ? $timestamp : number_format( $timestamp, 0, '', '' );
 
 	return new Woo_Tracks_Event( array_merge( $blog_details, (array) $properties, $identity, array(
@@ -94,20 +93,26 @@ function woo_tracks_get_identity( $user_id ) {
 /**
  * Record an event in Tracks - this is the preferred way to record events from PHP.
  *
- * @param mixed $identity username, user_id, or WP_user object
  * @param string $event_name The name of the event
  * @param array $properties Custom properties to send with the event
- * @param int $event_timestamp_millis The time in millis since 1970-01-01 00:00:00 when the event occurred
  * @return bool true for success | \WP_Error if the event pixel could not be fired
  */
-function woo_tracks_record_event( $user, $event_name, $properties = array(), $event_timestamp_millis = false ) {
+function woo_tracks_record_event( $event_name, $properties = array() ) {
+
+	$user = wp_get_current_user();
+
+	$data['_via_ua']  = isset( $_SERVER['HTTP_USER_AGENT'] ) ? $_SERVER['HTTP_USER_AGENT'] : '';
+	$data['_via_ip']  = isset( $_SERVER['REMOTE_ADDR'] ) ? $_SERVER['REMOTE_ADDR'] : '';
+	$data['_lg']      = isset( $_SERVER['HTTP_ACCEPT_LANGUAGE'] ) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '';
+	$data['blog_url'] = get_option( 'siteurl' );
+	$data['blog_id']  = Jetpack_Options::get_option( 'id' );
 
 	// We don't want to track user events during unit tests/CI runs.
 	if ( $user instanceof WP_User && 'wptests_capabilities' === $user->cap_key ) {
 		return false;
 	}
 
-	$event_obj = woo_tracks_build_event_obj( $user, $event_name, $properties, $event_timestamp_millis );
+	$event_obj = woo_tracks_build_event_obj( $user, $event_name, array_merge( $properties, $data ) );
 
 	if ( is_wp_error( $event_obj->error ) ) {
 		return $event_obj->error;
