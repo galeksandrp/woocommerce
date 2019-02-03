@@ -60,10 +60,6 @@ class Woo_Tracks_Client {
 			return $event;
 		}
 
-		echo "<pre>";
-        print_r($event);
-		echo "</pre>";
-
 		$pixel = $event->build_pixel_url( $event );
 
 		if ( ! $pixel ) {

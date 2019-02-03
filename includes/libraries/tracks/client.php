@@ -103,8 +103,6 @@ function woo_tracks_record_event( $event_name, $properties = array() ) {
 		return false;
 	}
 
-	print_r( $_SERVER );
-
 	// prefix $event_name here
 
 	$data = array(
