@@ -53,17 +53,16 @@ class Woo_Tracks_Client {
 	 * @return mixed         True on success, WP_Error on failure
 	 */
 	static function record_event( $event ) {
-		// comment out for now
-//		if ( ! Jetpack::jetpack_tos_agreed() || ! empty( $_COOKIE['tk_opt-out'] ) ) {
-//			return false;
-//		}
-
 		if ( ! $event instanceof Woo_Tracks_Event ) {
 			$event = new Woo_Tracks_Event( $event );
 		}
 		if ( is_wp_error( $event ) ) {
 			return $event;
 		}
+
+		echo "<pre>";
+        print_r($event);
+		echo "</pre>";
 
 		$pixel = $event->build_pixel_url( $event );
 
@@ -86,7 +85,7 @@ class Woo_Tracks_Client {
 			'timeout'     => 1,
 			'redirection' => 2,
 			'httpversion' => '1.1',
-			'user-agent'  => self::get_user_agent(),
+//			'user-agent'  => self::get_user_agent(),
 		) );
 
 		if ( is_wp_error( $response ) ) {
@@ -102,9 +101,9 @@ class Woo_Tracks_Client {
 		return true;
 	}
 
-	static function get_user_agent() {
-		return Woo_Tracks_Client::USER_AGENT_SLUG . '-v' . Woo_Tracks_Client::VERSION;
-	}
+//	static function get_user_agent() {
+//		return Woo_Tracks_Client::USER_AGENT_SLUG . '-v' . Woo_Tracks_Client::VERSION;
+//	}
 
 	/**
 	 * Build an event and return its tracking URL
@@ -115,20 +114,6 @@ class Woo_Tracks_Client {
 	static function build_pixel_url( $event ) {
 		$_event = new Woo_Tracks_Event( $event );
 		return $_event->build_pixel_url();
-	}
-
-	/**
-	 * Validate input for a tracks event.
-	 * @deprecated          Instantiate a Woo_Tracks_Event object instead
-	 * @param  array $event Event keys and values
-	 * @return mixed        Validated keys and values or WP_Error on failure
-	 */
-	private static function validate_and_sanitize( $event ) {
-		$_event = new Woo_Tracks_Event( $event );
-		if ( is_wp_error( $_event ) ) {
-			return $_event;
-		}
-		return get_object_vars( $_event );
 	}
 
 	// Milliseconds since 1970-01-01

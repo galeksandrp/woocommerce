@@ -18,32 +18,6 @@
 require_once( dirname(__FILE__) . '/class.tracks-event.php' );
 require_once( dirname(__FILE__) . '/class.tracks-client.php' );
 
-/**
- * Procedurally build a Tracks Event Object.
- * @param $identity WP_user object
- * @param string $event_name The name of the event
- * @param array $properties Custom properties to send with the event
- * @return \Woo_Tracks_Event|\WP_Error
- */
-function woo_tracks_build_event_obj( $user, $event_name, $properties = array() ) {
-
-	$identity = woo_tracks_get_identity( $user->ID );
-
-	$properties['user_lang'] = $user->get( 'WPLANG' );
-
-	$blog_details = array(
-		'blog_lang' => isset( $properties['blog_lang'] ) ? $properties['blog_lang'] : get_bloginfo( 'language' )
-	);
-
-	$timestamp = round( microtime( true ) * 1000 );
-	$timestamp_string = is_string( $timestamp ) ? $timestamp : number_format( $timestamp, 0, '', '' );
-
-	return new Woo_Tracks_Event( array_merge( $blog_details, (array) $properties, $identity, array(
-		'_en' => $event_name,
-		'_ts' => $timestamp_string
-	) ) );
-}
-
 /*
  * Get the identity to send to tracks.
  *
@@ -90,6 +64,30 @@ function woo_tracks_get_identity( $user_id ) {
 
 }
 
+function woo_tracks_get_blog_details() {
+	return array(
+		// @TODO: make it match wc-tracker
+		'url' => get_option( 'siteurl' ),
+		'blog_lang' => get_bloginfo( 'language' ),
+		'blog_id' => Jetpack_Options::get_option( 'id' ) || null
+	);
+}
+
+function woo_tracks_get_server_details() {
+	$data = array();
+
+	$data['_via_ua']  = isset( $_SERVER['HTTP_USER_AGENT'] ) ? $_SERVER['HTTP_USER_AGENT'] : '';
+	$data['_via_ip']  = isset( $_SERVER['REMOTE_ADDR'] ) ? $_SERVER['REMOTE_ADDR'] : '';
+	$data['_lg']  = isset( $_SERVER['HTTP_ACCEPT_LANGUAGE'] ) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '';
+	$data['_dr'] = isset( $_SERVER['HTTP_REFERER'] ) ? $_SERVER['HTTP_REFERER'] : '';
+
+	$uri = isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '';
+	$host = isset( $_SERVER['HTTP_HOST'] ) ? $_SERVER['HTTP_HOST'] : '';
+	$data['_dl'] = $_SERVER['REQUEST_SCHEME'] . '://' . $host . $uri;
+
+	return $data;
+}
+
 /**
  * Record an event in Tracks - this is the preferred way to record events from PHP.
  *
@@ -98,21 +96,27 @@ function woo_tracks_get_identity( $user_id ) {
  * @return bool true for success | \WP_Error if the event pixel could not be fired
  */
 function woo_tracks_record_event( $event_name, $properties = array() ) {
-
 	$user = wp_get_current_user();
-
-	$data['_via_ua']  = isset( $_SERVER['HTTP_USER_AGENT'] ) ? $_SERVER['HTTP_USER_AGENT'] : '';
-	$data['_via_ip']  = isset( $_SERVER['REMOTE_ADDR'] ) ? $_SERVER['REMOTE_ADDR'] : '';
-	$data['_lg']      = isset( $_SERVER['HTTP_ACCEPT_LANGUAGE'] ) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '';
-	$data['blog_url'] = get_option( 'siteurl' );
-	$data['blog_id']  = Jetpack_Options::get_option( 'id' );
 
 	// We don't want to track user events during unit tests/CI runs.
 	if ( $user instanceof WP_User && 'wptests_capabilities' === $user->cap_key ) {
 		return false;
 	}
 
-	$event_obj = woo_tracks_build_event_obj( $user, $event_name, array_merge( $properties, $data ) );
+	print_r( $_SERVER );
+
+	// prefix $event_name here
+
+	$data = array(
+		'_en' => $event_name,
+		'_ts' => Woo_Tracks_Client::build_timestamp()
+	);
+
+	$server_details = woo_tracks_get_server_details();
+	$identity = woo_tracks_get_identity( $user->ID );
+	$blog_details = woo_tracks_get_blog_details();
+
+	$event_obj = new Woo_Tracks_Event( array_merge( $data, $server_details, $identity, $blog_details, $properties ) );
 
 	if ( is_wp_error( $event_obj->error ) ) {
 		return $event_obj->error;
