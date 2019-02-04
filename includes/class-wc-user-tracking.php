@@ -3,7 +3,7 @@
  * Nosara Tracks for Woo
  */
 
-require_once( dirname( __FILE__ ) . '/libraries/tracks/client.php' );
+require_once( dirname( __FILE__ ) . '/libraries/tracks/class-tracks.php' );
 
 function action_woocommerce_update_product( $product_id, $post ) {
 	if ( $post->post_type !== 'product' ) {

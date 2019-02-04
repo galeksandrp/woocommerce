@@ -15,7 +15,7 @@
 ```
  */
 
-// Load the client classes
+// Load the client classes.
 require_once dirname( __FILE__ ) . '/class-tracks-event.php';
 require_once dirname( __FILE__ ) . '/class-tracks-client.php';
 
@@ -23,14 +23,13 @@ class Tracks {
 	/*
 	 * Get the identity to send to tracks.
 	 *
-	 * @param int $user_id The user id of the local user
-	 * @return array $identity
+	 * @param int $user_id The user id of the local user.
+	 * @return array $identity.
 	 */
-	static function get_identity( $user_id ) {
-
+	public static function get_identity( $user_id ) {
 		$has_jetpack = class_exists( 'Jetpack' );
 
-		// Meta is set, and user is still connected.  Use WPCOM ID
+		// Meta is set, and user is still connected.  Use WPCOM ID.
 		$wpcom_id = $has_jetpack && get_user_meta( $user_id, 'jetpack_tracks_wpcom_id', true );
 		if ( $wpcom_id && Jetpack::is_user_connected( $user_id ) ) {
 			return array(
@@ -68,7 +67,12 @@ class Tracks {
 
 	}
 
-	static function get_blog_details() {
+	/**
+	 * Gather blog related properties.
+	 *
+	 * @return array Blog details.
+	 */
+	public static function get_blog_details() {
 		return array(
 			// @TODO: Add revenue/product info and url similar to wc-tracker
 			'url'       => get_option( 'siteurl' ),
@@ -77,7 +81,12 @@ class Tracks {
 		);
 	}
 
-	static function get_server_details() {
+	/**
+	 * Gather details from the request to the server.
+	 *
+	 * @return array Server details.
+	 */
+	public static function get_server_details() {
 		$data = array();
 
 		$data['_via_ua'] = isset( $_SERVER['HTTP_USER_AGENT'] ) ? $_SERVER['HTTP_USER_AGENT'] : '';
@@ -95,11 +104,11 @@ class Tracks {
 	/**
 	 * Record an event in Tracks - this is the preferred way to record events from PHP.
 	 *
-	 * @param string $event_name The name of the event
-	 * @param array  $properties Custom properties to send with the event
-	 * @return bool true for success | \WP_Error if the event pixel could not be fired
+	 * @param string $event_name The name of the event.
+	 * @param array  $properties Custom properties to send with the event.
+	 * @return bool true for success | \WP_Error if the event pixel could not be fired.
 	 */
-	static function record_event( $event_name, $properties = array() ) {
+	public static function record_event( $event_name, $properties = array() ) {
 		$user = wp_get_current_user();
 
 		// We don't want to track user events during unit tests/CI runs.
