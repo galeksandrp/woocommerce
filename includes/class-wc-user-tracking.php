@@ -13,7 +13,7 @@ function action_woocommerce_update_product( $product_id, $post ) {
 		'product_id' => $product_id,
 	);
 
-	WooTracks::record_event( 'wca_test_update_product', $properties );
+	Tracks::record_event( 'wca_test_update_product', $properties );
 }
 
 function track_woo_usage() {

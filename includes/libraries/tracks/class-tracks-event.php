@@ -7,7 +7,7 @@
 ```php
 	require_once( dirname(__FILE__) . 'path/to/tracks/class.tracks-event' );
 
-	$event = new Woo_Tracks_Event( array(
+	$event = new Tracks_Event( array(
 		'_en'        => $event_name,       // required
 		'_ui'        => $user_id,          // required unless _ul is provided
 		'_ul'        => $user_login,       // required unless _ui is provided
@@ -36,11 +36,11 @@
 ```
  */
 
-require_once( dirname(__FILE__) . '/class.tracks-client.php' );
+require_once dirname( __FILE__ ) . '/class-tracks-client.php';
 
-class Woo_Tracks_Event {
+class Tracks_Event {
 	const EVENT_NAME_REGEX = '/^(([a-z0-9]+)_){2}([a-z0-9_]+)$/';
-	const PROP_NAME_REGEX = '/^[a-z_][a-z0-9_]*$/';
+	const PROP_NAME_REGEX  = '/^[a-z_][a-z0-9_]*$/';
 	public $error;
 
 	function __construct( $event ) {
@@ -50,18 +50,19 @@ class Woo_Tracks_Event {
 			return;
 		}
 
-		foreach( $_event as $key => $value ) {
+		foreach ( $_event as $key => $value ) {
 			$this->{$key} = $value;
 		}
 	}
 
 	function record() {
-		return Woo_Tracks_Client::record_event( $this );
+		return Tracks_Client::record_event( $this );
 	}
 
 	/**
 	 * Annotate the event with all relevant info.
-	 * @param  mixed		$event Object or (flat) array
+	 *
+	 * @param  mixed $event Object or (flat) array
 	 * @return mixed        The transformed event array or WP_Error on failure.
 	 */
 	static function validate_and_sanitize( $event ) {
@@ -74,20 +75,19 @@ class Woo_Tracks_Event {
 
 		// delete non-routable addresses otherwise geoip will discard the record entirely
 		if ( property_exists( $event, '_via_ip' ) && preg_match( '/^192\.168|^10\./', $event->_via_ip ) ) {
-			unset($event->_via_ip);
+			unset( $event->_via_ip );
 		}
 
 		$validated = array(
-			'browser_type'      => Woo_Tracks_Client::BROWSER_TYPE,
+			'browser_type' => Tracks_Client::BROWSER_TYPE,
 		);
 
 		$_event = (object) array_merge( (array) $event, $validated );
 
 		// If you want to blacklist property names, do it here.
-
 		// Make sure we have an event timestamp.
 		if ( ! isset( $_event->_ts ) ) {
-			$_event->_ts = Woo_Tracks_Client::build_timestamp();
+			$_event->_ts = Tracks_Client::build_timestamp();
 		}
 
 		return $_event;
@@ -112,22 +112,23 @@ class Woo_Tracks_Event {
 
 		$validated = self::validate_and_sanitize( $args );
 
-		if ( is_wp_error( $validated ) )
+		if ( is_wp_error( $validated ) ) {
 			return '';
+		}
 
-		return Woo_Tracks_Client::PIXEL . '?' . http_build_query( $validated );
+		return Tracks_Client::PIXEL . '?' . http_build_query( $validated );
 	}
 
 	static function event_name_is_valid( $name ) {
-		return preg_match( Woo_Tracks_Event::EVENT_NAME_REGEX, $name );
+		return preg_match( self::EVENT_NAME_REGEX, $name );
 	}
 
 	static function prop_name_is_valid( $name ) {
-		return preg_match( Woo_Tracks_Event::PROP_NAME_REGEX, $name );
+		return preg_match( self::PROP_NAME_REGEX, $name );
 	}
 
 	static function scrutinize_event_names( $event ) {
-		if ( ! Woo_Tracks_Event::event_name_is_valid( $event->_en ) ) {
+		if ( ! self::event_name_is_valid( $event->_en ) ) {
 			return;
 		}
 
@@ -140,7 +141,7 @@ class Woo_Tracks_Event {
 			if ( in_array( $key, $whitelisted_key_names ) ) {
 				continue;
 			}
-			if ( ! Woo_Tracks_Event::prop_name_is_valid( $key ) ) {
+			if ( ! self::prop_name_is_valid( $key ) ) {
 				return;
 			}
 		}

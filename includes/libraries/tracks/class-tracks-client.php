@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Woo_Tracks_Client
+ * Tracks_Client
+ *
  * @autounit nosara tracks-client
  *
  * Send Tracks events on behalf of a user
@@ -10,7 +11,7 @@
 ```php
 	require( dirname(__FILE__).'path/to/tracks/class.tracks-client' );
 
-	$result = Woo_Tracks_Client::record_event( array(
+	$result = Tracks_Client::record_event( array(
 		'_en'        => $event_name,       // required
 		'_ui'        => $user_id,          // required unless _ul is provided
 		'_ul'        => $user_login,       // required unless _ui is provided
@@ -38,22 +39,23 @@
 ```
  */
 
-require_once( dirname(__FILE__).'/class.tracks-client.php' );
+require_once dirname( __FILE__ ) . '/class-tracks-event.php';
 
-class Woo_Tracks_Client {
-	const PIXEL = 'https://pixel.wp.com/t.gif';
-	const BROWSER_TYPE = 'php-agent';
+class Tracks_Client {
+	const PIXEL           = 'https://pixel.wp.com/t.gif';
+	const BROWSER_TYPE    = 'php-agent';
 	const USER_AGENT_SLUG = 'tracks-client';
 
 	/**
-	 * record_event
-	 * @param  mixed  $event Event object to send to Tracks. An array will be cast to object. Required.
-	 *                       Properties are included directly in the pixel query string after light validation.
+	 * Record a Tracks event
+	 *
+	 * @param  mixed $event Event object to send to Tracks. An array will be cast to object. Required.
+	 *                      Properties are included directly in the pixel query string after light validation.
 	 * @return mixed         True on success, WP_Error on failure
 	 */
-	static function record_event( $event ) {
-		if ( ! $event instanceof Woo_Tracks_Event ) {
-			$event = new Woo_Tracks_Event( $event );
+	public static function record_event( $event ) {
+		if ( ! $event instanceof Tracks_Event ) {
+			$event = new Tracks_Event( $event );
 		}
 		if ( is_wp_error( $event ) ) {
 			return $event;
@@ -69,18 +71,23 @@ class Woo_Tracks_Client {
 	}
 
 	/**
-	 * Synchronously request the pixel
+	 * Synchronously request the pixel.
+	 *
+	 * @param string $pixel pixel url and query string.
 	 */
-	static function record_pixel( $pixel ) {
+	public static function record_pixel( $pixel ) {
 		// Add the Request Timestamp and URL terminator just before the HTTP request.
 		$pixel .= '&_rt=' . self::build_timestamp() . '&_=_';
 
-		$response = wp_remote_get( $pixel, array(
-			'blocking'    => true, // The default, but being explicit here :)
-			'timeout'     => 1,
-			'redirection' => 2,
-			'httpversion' => '1.1',
-		) );
+		$response = wp_remote_get(
+			$pixel,
+			array(
+				'blocking'    => true, // The default, but being explicit here.
+				'timeout'     => 1,
+				'redirection' => 2,
+				'httpversion' => '1.1',
+			)
+		);
 
 		if ( is_wp_error( $response ) ) {
 			return $response;
@@ -88,7 +95,7 @@ class Woo_Tracks_Client {
 
 		$code = isset( $response['response']['code'] ) ? $response['response']['code'] : 0;
 
-		if ( $code !== 200 ) {
+		if ( 200 !== $code ) {
 			return new WP_Error( 'request_failed', 'Tracks pixel request failed', $code );
 		}
 
@@ -97,17 +104,22 @@ class Woo_Tracks_Client {
 
 	/**
 	 * Build an event and return its tracking URL
-	 * @deprecated          Call the `build_pixel_url` method on a Woo_Tracks_Event object instead.
-	 * @param  array $event Event keys and values
-	 * @return string       URL of a tracking pixel
+	 *
+	 * @deprecated          Call the `build_pixel_url` method on a Tracks_Event object instead.
+	 * @param  array $event Event keys and values.
+	 * @return string       URL of a tracking pixel.
 	 */
-	static function build_pixel_url( $event ) {
-		$_event = new Woo_Tracks_Event( $event );
+	public static function build_pixel_url( $event ) {
+		$_event = new Tracks_Event( $event );
 		return $_event->build_pixel_url();
 	}
 
-	// Milliseconds since 1970-01-01
-	static function build_timestamp() {
+	/**
+	 * Create a timestap representing milliseconds since 1970-01-01
+	 *
+	 * @return string
+	 */
+	public static function build_timestamp() {
 		$ts = round( microtime( true ) * 1000 );
 		return number_format( $ts, 0, '', '' );
 	}
@@ -117,22 +129,22 @@ class Woo_Tracks_Client {
 	 *
 	 * @return string An anon id for the user
 	 */
-	static function get_anon_id() {
+	public static function get_anon_id() {
 		static $anon_id = null;
 
 		if ( ! isset( $anon_id ) ) {
 
 			// Did the browser send us a cookie?
-			if ( isset( $_COOKIE[ 'tk_ai' ] ) && preg_match( '#^[A-Za-z0-9+/=]{24}$#', $_COOKIE[ 'tk_ai' ] ) ) {
-				$anon_id = $_COOKIE[ 'tk_ai' ];
+			if ( isset( $_COOKIE['tk_ai'] ) && preg_match( '#^[A-Za-z0-9+/=]{24}$#', $_COOKIE['tk_ai'] ) ) {
+				$anon_id = $_COOKIE['tk_ai'];
 			} else {
 
 				$binary = '';
 
 				// Generate a new anonId and try to save it in the browser's cookies
-				// Note that base64-encoding an 18 character string generates a 24-character anon id
+				// Note that base64-encoding an 18 character string generates a 24-character anon id.
 				for ( $i = 0; $i < 18; ++$i ) {
-					$binary .= chr( mt_rand( 0, 255 ) );
+					$binary .= chr( wp_rand( 0, 255 ) );
 				}
 
 				$anon_id = 'jetpack:' . base64_encode( $binary );
@@ -154,13 +166,13 @@ class Woo_Tracks_Client {
 	 *
 	 * @return array|bool
 	 */
-	static function get_connected_user_tracks_identity() {
-		if ( ! $user_data = Jetpack::get_connected_user_data() ) {
+	public static function get_connected_user_tracks_identity() {
+		if ( ! Jetpack::get_connected_user_data() ) {
 			return false;
 		}
 
 		return array(
-			'userid' => $user_data['ID'],
+			'userid'   => $user_data['ID'],
 			'username' => $user_data['login'],
 		);
 	}
