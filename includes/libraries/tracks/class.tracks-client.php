@@ -44,7 +44,6 @@ class Woo_Tracks_Client {
 	const PIXEL = 'https://pixel.wp.com/t.gif';
 	const BROWSER_TYPE = 'php-agent';
 	const USER_AGENT_SLUG = 'tracks-client';
-	const VERSION = '0.3';
 
 	/**
 	 * record_event
@@ -81,7 +80,6 @@ class Woo_Tracks_Client {
 			'timeout'     => 1,
 			'redirection' => 2,
 			'httpversion' => '1.1',
-//			'user-agent'  => self::get_user_agent(),
 		) );
 
 		if ( is_wp_error( $response ) ) {
@@ -96,10 +94,6 @@ class Woo_Tracks_Client {
 
 		return true;
 	}
-
-//	static function get_user_agent() {
-//		return Woo_Tracks_Client::USER_AGENT_SLUG . '-v' . Woo_Tracks_Client::VERSION;
-//	}
 
 	/**
 	 * Build an event and return its tracking URL
