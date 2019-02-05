@@ -5,7 +5,7 @@
  * @class   Tracks_Event
  * @package WooCommerce/Classes
  * ```
-	require_once( dirname(__FILE__) . 'path/to/tracks/class.tracks-event' );
+	require_once( dirname(__FILE__) . 'path/to/tracks/class-tracks-event.php' );
 
 	$event = new Tracks_Event( array(
 	'_en'        => $event_name,       // required
@@ -20,19 +20,9 @@
 	'_via_url'   => $client_url,
 	'_via_ref'   => $client_referrer,
 
-	// For user-targeted tests
-	'abtest_name'        => $abtest_name,
-	'abtest_variation'   => $abtest_variation,
-
-	// Your application-specific properties
-	'custom_property'    => $some_value,
-	) );
-
 	if ( is_wp_error( $event->error ) ) {
-	// Handle the error in your app
+		// Handle the error in your app
 	}
-
-	$bump_and_redirect_pixel = $event->build_signed_pixel_url();
 ```*/
 
 require_once dirname( __FILE__ ) . '/class-tracks-client.php';

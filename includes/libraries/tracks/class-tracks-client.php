@@ -9,7 +9,7 @@
  *
  * Example Usage:
 ```php
-	require( dirname(__FILE__).'path/to/tracks/class.tracks-client' );
+	require( dirname(__FILE__).'path/to/tracks/class-tracks-client.php' );
 
 	$result = Tracks_Client::record_event( array(
 		'_en'        => $event_name,       // required
@@ -24,13 +24,6 @@
 		'_via_ua'    => $client_user_agent,
 		'_via_url'   => $client_url,
 		'_via_ref'   => $client_referrer,
-
-		// For user-targeted tests
-		'abtest_name'        => $abtest_name,
-		'abtest_variation'   => $abtest_variation,
-
-		// Your application-specific properties
-		'custom_property'    => $some_value,
 	) );
 
 	if ( is_wp_error( $result ) ) {

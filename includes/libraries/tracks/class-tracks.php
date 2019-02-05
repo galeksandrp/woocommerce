@@ -8,8 +8,8 @@
  * Example Usage:
  *
 ```php
-	include( plugin_dir_path( __FILE__ ) . 'lib/tracks/client.php');
-	$result = woo_tracks_record_event( $user, $event_name, $properties );
+	require_once( dirname( __FILE__ ) . '/libraries/tracks/class-tracks.php' );
+	$result = Tracks::record_event( 'wca_test_update_product', array() );
 
 	if ( is_wp_error( $result ) ) {
 		// Handle the error in your app
