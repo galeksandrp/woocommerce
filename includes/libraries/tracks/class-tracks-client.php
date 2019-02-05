@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Tracks_Client
+ * Send Tracks events on behalf of a user.
  *
- * @autounit nosara tracks-client
+ * @class   Tracks_Client
+ * @package WooCommerce/Classes
  *
- * Send Tracks events on behalf of a user
  *
  * Example Usage:
 ```php
@@ -41,6 +41,9 @@
 
 require_once dirname( __FILE__ ) . '/class-tracks-event.php';
 
+/**
+ * Class Tracks_Client.
+ */
 class Tracks_Client {
 	const PIXEL           = 'https://pixel.wp.com/t.gif';
 	const BROWSER_TYPE    = 'php-agent';
@@ -74,6 +77,7 @@ class Tracks_Client {
 	 * Synchronously request the pixel.
 	 *
 	 * @param string $pixel pixel url and query string.
+	 * @return mixed An error or true if successful.
 	 */
 	public static function record_pixel( $pixel ) {
 		// Add the Request Timestamp and URL terminator just before the HTTP request.

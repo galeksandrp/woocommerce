@@ -1,48 +1,60 @@
 <?php
-
 /**
- * @autounit nosara tracks-client
+ * This class represents an event used to record a Tracks event.
  *
- * Example Usage:
-```php
+ * @class   Tracks_Event
+ * @package WooCommerce/Classes
+ * ```
 	require_once( dirname(__FILE__) . 'path/to/tracks/class.tracks-event' );
 
 	$event = new Tracks_Event( array(
-		'_en'        => $event_name,       // required
-		'_ui'        => $user_id,          // required unless _ul is provided
-		'_ul'        => $user_login,       // required unless _ui is provided
+	'_en'        => $event_name,       // required
+	'_ui'        => $user_id,          // required unless _ul is provided
+	'_ul'        => $user_login,       // required unless _ui is provided
 
-		// Optional, but recommended
-		'_via_ip'    => $client_ip,        // for geo, etc.
+	// Optional, but recommended
+	'_via_ip'    => $client_ip,        // for geo, etc.
 
-		// Possibly useful to set some context for the event
-		'_via_ua'    => $client_user_agent,
-		'_via_url'   => $client_url,
-		'_via_ref'   => $client_referrer,
+	// Possibly useful to set some context for the event
+	'_via_ua'    => $client_user_agent,
+	'_via_url'   => $client_url,
+	'_via_ref'   => $client_referrer,
 
-		// For user-targeted tests
-		'abtest_name'        => $abtest_name,
-		'abtest_variation'   => $abtest_variation,
+	// For user-targeted tests
+	'abtest_name'        => $abtest_name,
+	'abtest_variation'   => $abtest_variation,
 
-		// Your application-specific properties
-		'custom_property'    => $some_value,
+	// Your application-specific properties
+	'custom_property'    => $some_value,
 	) );
 
 	if ( is_wp_error( $event->error ) ) {
-		// Handle the error in your app
+	// Handle the error in your app
 	}
 
 	$bump_and_redirect_pixel = $event->build_signed_pixel_url();
-```
- */
+```*/
 
 require_once dirname( __FILE__ ) . '/class-tracks-client.php';
 
+/**
+ * Tracks_Event class.
+ */
 class Tracks_Event {
 	const EVENT_NAME_REGEX = '/^(([a-z0-9]+)_){2}([a-z0-9_]+)$/';
 	const PROP_NAME_REGEX  = '/^[a-z_][a-z0-9_]*$/';
+	/**
+	 * Error message.
+	 *
+	 * @var mixed
+	 */
 	public $error;
 
+	/**
+	 * Tracks_Event constructor.
+	 *
+	 * @param array $event Event properties.
+	 */
 	public function __construct( $event ) {
 		$_event = self::validate_and_sanitize( $event );
 		if ( is_wp_error( $_event ) ) {

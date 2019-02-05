@@ -2,7 +2,9 @@
 /**
  * PHP Tracks Client
  *
- * @autounit nosara tracks-client
+ * @class   Tracks
+ * @package WooCommerce/Classes
+ *
  * Example Usage:
  *
 ```php
@@ -19,12 +21,15 @@
 require_once dirname( __FILE__ ) . '/class-tracks-event.php';
 require_once dirname( __FILE__ ) . '/class-tracks-client.php';
 
+/**
+ * Class Tracks
+ */
 class Tracks {
-	/*
+	/**
 	 * Get the identity to send to tracks.
 	 *
-	 * @param int $user_id The user id of the local user.
-	 * @return array $identity.
+	 * @param int $user_id User id.
+	 * @return array Identity properties.
 	 */
 	public static function get_identity( $user_id ) {
 		$has_jetpack = class_exists( 'Jetpack' );
