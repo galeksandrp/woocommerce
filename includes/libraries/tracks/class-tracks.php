@@ -25,6 +25,7 @@ require_once dirname( __FILE__ ) . '/class-tracks-client.php';
  * Class Tracks
  */
 class Tracks {
+	const PREFIX = 'wca_test_';
 	/**
 	 * Get the identity to send to tracks.
 	 *
@@ -133,7 +134,7 @@ class Tracks {
 		}
 
 		$data = array(
-			'_en' => $event_name,
+			'_en' => self::PREFIX . $event_name,
 			'_ts' => Tracks_Client::build_timestamp(),
 		);
 

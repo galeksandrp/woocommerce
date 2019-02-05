@@ -5,7 +5,7 @@
 
 require_once( dirname( __FILE__ ) . '/libraries/tracks/class-tracks.php' );
 
-function action_woocommerce_update_product( $product_id, $post ) {
+function woocommerce_tracks_product_updated( $product_id, $post ) {
 	if ( $post->post_type !== 'product' ) {
 		return;
 	};
@@ -13,11 +13,11 @@ function action_woocommerce_update_product( $product_id, $post ) {
 		'product_id' => $product_id,
 	);
 
-	Tracks::record_event( 'wca_test_update_product', $properties );
+	Tracks::record_event( 'update_product', $properties );
 }
 
 function track_woo_usage() {
-	add_action( 'edit_post', 'action_woocommerce_update_product', 10, 2 );
+	add_action( 'edit_post', 'woocommerce_tracks_product_updated', 10, 2 );
 }
 
 add_action( 'init',  'track_woo_usage' );
