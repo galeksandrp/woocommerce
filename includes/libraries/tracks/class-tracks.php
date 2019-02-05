@@ -77,11 +77,11 @@ class Tracks {
 	 *
 	 * @return array Blog details.
 	 */
-	public static function get_blog_details() {
+	public static function get_blog_details( $user_id ) {
 		return array(
 			// @TODO: Add revenue/product info and url similar to wc-tracker
 			'url'       => get_option( 'siteurl' ),
-			'blog_lang' => get_bloginfo( 'language' ),
+			'blog_lang' => get_user_locale( $user_id ),
 			'blog_id'   => ( class_exists( 'Jetpack' ) && Jetpack_Options::get_option( 'id' ) ) || null,
 		);
 	}
@@ -121,6 +121,17 @@ class Tracks {
 			return false;
 		}
 
+		/**
+		 * Don't track users who haven't opted-in to tracking or if a filter
+		 * has been applied to turn it off.
+		 */
+		if (
+			'yes' !== get_option( 'woocommerce_allow_tracking' ) &&
+			! apply_filters( 'woocommerce_apply_user_tracking', true )
+		) {
+			return false;
+		}
+
 		$data = array(
 			'_en' => $event_name,
 			'_ts' => Tracks_Client::build_timestamp(),
@@ -128,7 +139,7 @@ class Tracks {
 
 		$server_details = self::get_server_details();
 		$identity       = self::get_identity( $user->ID );
-		$blog_details   = self::get_blog_details();
+		$blog_details   = self::get_blog_details( $user->ID );
 
 		$event_obj = new Tracks_Event( array_merge( $data, $server_details, $identity, $blog_details, $properties ) );
 
