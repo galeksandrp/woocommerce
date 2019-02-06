@@ -2,35 +2,18 @@
 /**
  * This class represents an event used to record a Tracks event.
  *
- * @class   Tracks_Event
+ * @class   WC_Tracks_Event
  * @package WooCommerce/Classes
- * ```
-	require_once( dirname(__FILE__) . 'path/to/tracks/class-tracks-event.php' );
+*/
 
-	$event = new Tracks_Event( array(
-	'_en'        => $event_name,       // required
-	'_ui'        => $user_id,          // required unless _ul is provided
-	'_ul'        => $user_login,       // required unless _ui is provided
-
-	// Optional, but recommended
-	'_via_ip'    => $client_ip,        // for geo, etc.
-
-	// Possibly useful to set some context for the event
-	'_via_ua'    => $client_user_agent,
-	'_via_url'   => $client_url,
-	'_via_ref'   => $client_referrer,
-
-	if ( is_wp_error( $event->error ) ) {
-		// Handle the error in your app
-	}
-```*/
-
-require_once dirname( __FILE__ ) . '/class-tracks-client.php';
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 
 /**
- * Tracks_Event class.
+ * WC_Tracks_Event class.
  */
-class Tracks_Event {
+class WC_Tracks_Event {
 	const EVENT_NAME_REGEX = '/^(([a-z0-9]+)_){2}([a-z0-9_]+)$/';
 	const PROP_NAME_REGEX  = '/^[a-z_][a-z0-9_]*$/';
 	/**
@@ -41,7 +24,7 @@ class Tracks_Event {
 	public $error;
 
 	/**
-	 * Tracks_Event constructor.
+	 * WC_Tracks_Event constructor.
 	 *
 	 * @param array $event Event properties.
 	 */
@@ -63,7 +46,7 @@ class Tracks_Event {
 	 * @return mixed Result of the event.
 	 */
 	public function record() {
-		return Tracks_Client::record_event( $this );
+		return WC_Tracks_Client::record_event( $this );
 	}
 
 	/**
@@ -86,7 +69,7 @@ class Tracks_Event {
 		}
 
 		$validated = array(
-			'browser_type' => Tracks_Client::BROWSER_TYPE,
+			'browser_type' => WC_Tracks_Client::BROWSER_TYPE,
 		);
 
 		$_event = (object) array_merge( (array) $event, $validated );
@@ -94,7 +77,7 @@ class Tracks_Event {
 		// If you want to blacklist property names, do it here.
 		// Make sure we have an event timestamp.
 		if ( ! isset( $_event->_ts ) ) {
-			$_event->_ts = Tracks_Client::build_timestamp();
+			$_event->_ts = WC_Tracks_Client::build_timestamp();
 		}
 
 		return $_event;
@@ -114,8 +97,7 @@ class Tracks_Event {
 		$args = get_object_vars( $this );
 
 		// Request Timestamp and URL Terminator must be added just before the HTTP request or not at all.
-		unset( $args['_rt'] );
-		unset( $args['_'] );
+		unset( $args['_rt'], $args['_'] );
 
 		$validated = self::validate_and_sanitize( $args );
 
@@ -123,7 +105,7 @@ class Tracks_Event {
 			return '';
 		}
 
-		return Tracks_Client::PIXEL . '?' . http_build_query( $validated );
+		return WC_Tracks_Client::PIXEL . '?' . http_build_query( $validated );
 	}
 
 	/**

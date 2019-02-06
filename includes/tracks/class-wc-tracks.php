@@ -2,14 +2,14 @@
 /**
  * PHP Tracks Client
  *
- * @class   Tracks
+ * @class   WC_Tracks
  * @package WooCommerce/Classes
  *
  * Example Usage:
  *
 ```php
-	require_once( dirname( __FILE__ ) . '/libraries/tracks/class-tracks.php' );
-	$result = Tracks::record_event( 'wca_test_update_product', array() );
+	require_once( dirname( __FILE__ ) . '/libraries/tracks/class-wc-tracks.php' );
+	$result = WC_Tracks::record_event( 'wca_test_update_product', array() );
 
 	if ( is_wp_error( $result ) ) {
 		// Handle the error in your app
@@ -17,14 +17,11 @@
 ```
  */
 
-// Load the client classes.
-require_once dirname( __FILE__ ) . '/class-tracks-event.php';
-require_once dirname( __FILE__ ) . '/class-tracks-client.php';
-
 /**
- * Class Tracks
+ * Class WC_Tracks
  */
-class Tracks {
+class WC_Tracks {
+	// @TODO: Find a good prefix.
 	const PREFIX = 'wca_test_';
 	/**
 	 * Get the identity to send to tracks.
@@ -58,7 +55,7 @@ class Tracks {
 		// User isn't linked at all.  Fall back to anonymous ID.
 		$anon_id = get_user_meta( $user_id, 'jetpack_tracks_anon_id', true );
 		if ( ! $anon_id ) {
-			$anon_id = Tracks_Client::get_anon_id();
+			$anon_id = WC_Tracks_Client::get_anon_id();
 			add_user_meta( $user_id, 'jetpack_tracks_anon_id', $anon_id, false );
 		}
 
@@ -135,14 +132,14 @@ class Tracks {
 
 		$data = array(
 			'_en' => self::PREFIX . $event_name,
-			'_ts' => Tracks_Client::build_timestamp(),
+			'_ts' => WC_Tracks_Client::build_timestamp(),
 		);
 
 		$server_details = self::get_server_details();
 		$identity       = self::get_identity( $user->ID );
 		$blog_details   = self::get_blog_details( $user->ID );
 
-		$event_obj = new Tracks_Event( array_merge( $data, $server_details, $identity, $blog_details, $properties ) );
+		$event_obj = new WC_WC_Tracks_Event( array_merge( $data, $server_details, $identity, $blog_details, $properties ) );
 
 		if ( is_wp_error( $event_obj->error ) ) {
 			return $event_obj->error;

@@ -3,41 +3,18 @@
 /**
  * Send Tracks events on behalf of a user.
  *
- * @class   Tracks_Client
+ * @class   WC_Tracks_Client
  * @package WooCommerce/Classes
- *
- *
- * Example Usage:
-```php
-	require( dirname(__FILE__).'path/to/tracks/class-tracks-client.php' );
-
-	$result = Tracks_Client::record_event( array(
-		'_en'        => $event_name,       // required
-		'_ui'        => $user_id,          // required unless _ul is provided
-		'_ul'        => $user_login,       // required unless _ui is provided
-
-		// Optional, but recommended
-		'_ts'        => $ts_in_ms,         // Default: now
-		'_via_ip'    => $client_ip,        // we use it for geo, etc.
-
-		// Possibly useful to set some context for the event
-		'_via_ua'    => $client_user_agent,
-		'_via_url'   => $client_url,
-		'_via_ref'   => $client_referrer,
-	) );
-
-	if ( is_wp_error( $result ) ) {
-		// Handle the error in your app
-	}
-```
  */
 
-require_once dirname( __FILE__ ) . '/class-tracks-event.php';
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 
 /**
- * Class Tracks_Client.
+ * Class WC_Tracks_Client.
  */
-class Tracks_Client {
+class WC_Tracks_Client {
 	const PIXEL           = 'https://pixel.wp.com/t.gif';
 	const BROWSER_TYPE    = 'php-agent';
 	const USER_AGENT_SLUG = 'tracks-client';
@@ -50,8 +27,8 @@ class Tracks_Client {
 	 * @return mixed         True on success, WP_Error on failure
 	 */
 	public static function record_event( $event ) {
-		if ( ! $event instanceof Tracks_Event ) {
-			$event = new Tracks_Event( $event );
+		if ( ! $event instanceof WC_Tracks_Event ) {
+			$event = new WC_Tracks_Event( $event );
 		}
 		if ( is_wp_error( $event ) ) {
 			return $event;
@@ -100,18 +77,6 @@ class Tracks_Client {
 	}
 
 	/**
-	 * Build an event and return its tracking URL
-	 *
-	 * @deprecated          Call the `build_pixel_url` method on a Tracks_Event object instead.
-	 * @param  array $event Event keys and values.
-	 * @return string       URL of a tracking pixel.
-	 */
-	public static function build_pixel_url( $event ) {
-		$_event = new Tracks_Event( $event );
-		return $_event->build_pixel_url();
-	}
-
-	/**
 	 * Create a timestap representing milliseconds since 1970-01-01
 	 *
 	 * @return string
@@ -156,21 +121,5 @@ class Tracks_Client {
 		}
 
 		return $anon_id;
-	}
-
-	/**
-	 * Gets the WordPress.com user's Tracks identity, if connected.
-	 *
-	 * @return array|bool
-	 */
-	public static function get_connected_user_tracks_identity() {
-		if ( ! Jetpack::get_connected_user_data() ) {
-			return false;
-		}
-
-		return array(
-			'userid'   => $user_data['ID'],
-			'username' => $user_data['login'],
-		);
 	}
 }
