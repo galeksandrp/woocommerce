@@ -22,9 +22,8 @@ class WC_Tracks_Client {
 	/**
 	 * Record a Tracks event
 	 *
-	 * @param  mixed $event Event object to send to Tracks. An array will be cast to object. Required.
-	 *                      Properties are included directly in the pixel query string after light validation.
-	 * @return mixed         True on success, WP_Error on failure
+	 * @param  array $event Array of event properties
+	 * @return bool|WP_Error         True on success, WP_Error on failure.
 	 */
 	public static function record_event( $event ) {
 		if ( ! $event instanceof WC_Tracks_Event ) {
@@ -47,7 +46,7 @@ class WC_Tracks_Client {
 	 * Synchronously request the pixel.
 	 *
 	 * @param string $pixel pixel url and query string.
-	 * @return mixed An error or true if successful.
+	 * @return bool|WP_Error         True on success, WP_Error on failure.
 	 */
 	public static function record_pixel( $pixel ) {
 		// Add the Request Timestamp and URL terminator just before the HTTP request.
@@ -79,7 +78,7 @@ class WC_Tracks_Client {
 	/**
 	 * Create a timestap representing milliseconds since 1970-01-01
 	 *
-	 * @return string
+	 * @return string A string representing a timestamp.
 	 */
 	public static function build_timestamp() {
 		$ts = round( microtime( true ) * 1000 );

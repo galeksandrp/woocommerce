@@ -4,7 +4,7 @@
  *
  * @class   WC_Tracks_Event
  * @package WooCommerce/Classes
-*/
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -17,9 +17,9 @@ class WC_Tracks_Event {
 	const EVENT_NAME_REGEX = '/^(([a-z0-9]+)_){2}([a-z0-9_]+)$/';
 	const PROP_NAME_REGEX  = '/^[a-z_][a-z0-9_]*$/';
 	/**
-	 * Error message.
+	 * Error message as WP_Error.
 	 *
-	 * @var mixed
+	 * @var WP_Error
 	 */
 	public $error;
 
@@ -43,7 +43,7 @@ class WC_Tracks_Event {
 	/**
 	 * Record Tracks event
 	 *
-	 * @return mixed Result of the event.
+	 * @return bool|WP_Error         True on success, WP_Error on failure.
 	 */
 	public function record() {
 		return WC_Tracks_Client::record_event( $this );
@@ -52,8 +52,8 @@ class WC_Tracks_Event {
 	/**
 	 * Annotate the event with all relevant info.
 	 *
-	 * @param  mixed $event Object or (flat) array.
-	 * @return mixed        The transformed event array or WP_Error on failure.
+	 * @param  array $event Event arguments.
+	 * @return bool|WP_Error         True on success, WP_Error on failure.
 	 */
 	public static function validate_and_sanitize( $event ) {
 		$event = (object) $event;

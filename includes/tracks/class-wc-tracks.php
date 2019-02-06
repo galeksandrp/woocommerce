@@ -73,6 +73,7 @@ class WC_Tracks {
 	/**
 	 * Gather blog related properties.
 	 *
+	 * @param int $user_id User id.
 	 * @return array Blog details.
 	 */
 	public static function get_blog_details( $user_id ) {
@@ -109,7 +110,7 @@ class WC_Tracks {
 	 *
 	 * @param string $event_name The name of the event.
 	 * @param array  $properties Custom properties to send with the event.
-	 * @return bool true for success | \WP_Error if the event pixel could not be fired.
+	 * @return bool|WP_Error true for success or WP_Error if the event pixel could not be fired.
 	 */
 	public static function record_event( $event_name, $properties = array() ) {
 		$user = wp_get_current_user();
@@ -124,7 +125,7 @@ class WC_Tracks {
 		 * has been applied to turn it off.
 		 */
 		if (
-			'yes' !== get_option( 'woocommerce_allow_tracking' ) &&
+			'yes' !== get_option( 'woocommerce_allow_site_tracking' ) &&
 			! apply_filters( 'woocommerce_apply_user_tracking', true )
 		) {
 			return false;
