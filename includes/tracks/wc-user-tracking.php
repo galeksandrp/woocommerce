@@ -3,9 +3,9 @@
  * Nosara Tracks for Woo
  */
 
-require_once dirname(__FILE__) . '/tracks/class-wc-tracks.php';
-require_once dirname(__FILE__) . '/tracks/class-wc-tracks-event.php';
-require_once dirname(__FILE__) . '/tracks/class-wc-tracks-client.php';
+require_once dirname(__FILE__) . '/class-wc-tracks.php';
+require_once dirname(__FILE__) . '/class-wc-tracks-event.php';
+require_once dirname(__FILE__) . '/class-wc-tracks-client.php';
 
 function woocommerce_tracks_product_updated( $product_id, $post ) {
 	if ( $post->post_type !== 'product' ) {
@@ -19,6 +19,9 @@ function woocommerce_tracks_product_updated( $product_id, $post ) {
 }
 
 function track_woo_usage() {
+	if ( ! class_exists( 'WC_Tracks' ) ) {
+		return;
+	}
 	add_action( 'edit_post', 'woocommerce_tracks_product_updated', 10, 2 );
 }
 

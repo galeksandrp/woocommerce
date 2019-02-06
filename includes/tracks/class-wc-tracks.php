@@ -139,7 +139,7 @@ class WC_Tracks {
 		$identity       = self::get_identity( $user->ID );
 		$blog_details   = self::get_blog_details( $user->ID );
 
-		$event_obj = new WC_WC_Tracks_Event( array_merge( $data, $server_details, $identity, $blog_details, $properties ) );
+		$event_obj = new WC_Tracks_Event( array_merge( $data, $server_details, $identity, $blog_details, $properties ) );
 
 		if ( is_wp_error( $event_obj->error ) ) {
 			return $event_obj->error;
