@@ -32,33 +32,18 @@ class WC_Tracks {
 	 * @return array Identity properties.
 	 */
 	public static function get_identity( $user_id ) {
-		$has_jetpack = class_exists( 'Jetpack' );
+		if ( class_exists( 'Jetpack' ) ) {
+			include_once( ABSPATH . 'wp-content/plugins/jetpack/_inc/lib/tracks/client.php' );
 
-		// Meta is set, and user is still connected.  Use WPCOM ID.
-		$wpcom_id = $has_jetpack && get_user_meta( $user_id, 'jetpack_tracks_wpcom_id', true );
-		if ( $wpcom_id && Jetpack::is_user_connected( $user_id ) ) {
-			return array(
-				'_ut' => 'wpcom:user_id',
-				'_ui' => $wpcom_id,
-			);
+			if ( function_exists( 'jetpack_tracks_get_identity' ) ) {
+				return jetpack_tracks_get_identity( $user_id );
+			}
 		}
 
-		// User is connected, but no meta is set yet.  Use WPCOM ID and set meta.
-		if ( $has_jetpack && Jetpack::is_user_connected( $user_id ) ) {
-			$wpcom_user_data = Jetpack::get_connected_user_data( $user_id );
-			add_user_meta( $user_id, 'jetpack_tracks_wpcom_id', $wpcom_user_data['ID'], true );
-
-			return array(
-				'_ut' => 'wpcom:user_id',
-				'_ui' => $wpcom_user_data['ID'],
-			);
-		}
-
-		// User isn't linked at all.  Fall back to anonymous ID.
-		$anon_id = get_user_meta( $user_id, 'jetpack_tracks_anon_id', true );
+		$anon_id = get_user_meta( $user_id, 'woo_tracks_anon_id', true );
 		if ( ! $anon_id ) {
 			$anon_id = WC_Tracks_Client::get_anon_id();
-			add_user_meta( $user_id, 'jetpack_tracks_anon_id', $anon_id, false );
+			add_user_meta( $user_id, 'woo_tracks_anon_id', $anon_id, false );
 		}
 
 		if ( ! isset( $_COOKIE['tk_ai'] ) && ! headers_sent() ) {
@@ -81,7 +66,7 @@ class WC_Tracks {
 	public static function get_blog_details( $user_id ) {
 		return array(
 			// @TODO: Add revenue/product info and url similar to wc-tracker
-			'url'       => get_option( 'siteurl' ),
+			'url'       => home_url(),
 			'blog_lang' => get_user_locale( $user_id ),
 			'blog_id'   => ( class_exists( 'Jetpack' ) && Jetpack_Options::get_option( 'id' ) ) || null,
 		);

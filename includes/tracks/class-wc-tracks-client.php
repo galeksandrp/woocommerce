@@ -110,7 +110,7 @@ class WC_Tracks_Client {
 					$binary .= chr( wp_rand( 0, 255 ) );
 				}
 
-				$anon_id = 'jetpack:' . base64_encode( $binary );
+				$anon_id = 'woo:' . base64_encode( $binary );
 
 				if ( ! headers_sent()
 					&& ! ( defined( 'REST_REQUEST' ) && REST_REQUEST )
