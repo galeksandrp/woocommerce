@@ -26,6 +26,8 @@ class WC_Tracks {
 	/**
 	 * Get the identity to send to tracks.
 	 *
+	 * @TODO: Determine the best way to identify sites/users with/without Jetpack connection.
+	 *
 	 * @param int $user_id User id.
 	 * @return array Identity properties.
 	 */

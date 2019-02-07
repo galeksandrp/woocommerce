@@ -88,6 +88,8 @@ class WC_Tracks_Client {
 	/**
 	 * Grabs the user's anon id from cookies, or generates and sets a new one
 	 *
+	 * @TODO: Determine the best way to identify sites/users with/without Jetpack connection.
+	 *
 	 * @return string An anon id for the user
 	 */
 	public static function get_anon_id() {
