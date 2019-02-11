@@ -77,9 +77,7 @@ class WC_REST_Authentication {
 			return $user_id;
 		}
 
-		if ( is_ssl() ) {
-			$user_id = $this->perform_basic_authentication();
-		}
+		$user_id = $this->perform_basic_authentication();
 
 		if ( $user_id ) {
 			return $user_id;
