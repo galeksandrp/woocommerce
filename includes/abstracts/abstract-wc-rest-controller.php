@@ -93,7 +93,7 @@ abstract class WC_REST_Controller extends WP_REST_Controller {
 	 * @return bool|WP_Error
 	 */
 	protected function check_batch_limit( $items ) {
-		$limit = apply_filters( 'woocommerce_rest_batch_items_limit', 100, $this->get_normalized_rest_base() );
+		$limit = apply_filters( 'woocommerce_rest_batch_items_limit', 100000, $this->get_normalized_rest_base() );
 		$total = 0;
 
 		if ( ! empty( $items['create'] ) ) {
