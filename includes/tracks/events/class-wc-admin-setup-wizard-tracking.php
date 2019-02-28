@@ -115,6 +115,13 @@ class WC_Admin_Setup_Wizard_Tracking {
 			$( document ).on( 'submit', form, function() {
 				window.wcTracks.recordEvent( 'obw_marketing_signup' );
 			} );
+			$( '.wc-setup-content a' ).click( function trackNextScreen( e ) {
+				var properties = {
+					next_url: e.target.href,
+					button: e.target.textContent && e.target.textContent.trim()
+				};
+				window.wcTracks.recordEvent( 'obw_ready_next_step', properties );
+			} );
 		"
 		);
 	}
