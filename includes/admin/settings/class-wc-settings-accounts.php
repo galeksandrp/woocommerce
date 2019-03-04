@@ -36,7 +36,7 @@ class WC_Settings_Accounts extends WC_Settings_Page {
 			$erasure_text = sprintf( '<a href="%s">%s</a>', esc_url( admin_url( 'tools.php?page=remove_personal_data' ) ), $erasure_text );
 		}
 
-		$tracking_info_text = sprintf( '<a href="%s">%s</a>','https://woocommerce.com/usage-tracking', esc_html__( 'Read more about what we collect' ) );
+		$tracking_info_text = sprintf( '<a href="%s" target="_blank">%s</a>','https://woocommerce.com/usage-tracking', esc_html__( 'Read more about what we collect', 'woocommerce' ) );
 
 		$settings = apply_filters(
 			'woocommerce_' . $this->id . '_settings',
@@ -174,7 +174,7 @@ class WC_Settings_Accounts extends WC_Settings_Page {
 					'id'   => 'privacy_policy_options',
 				),
 				array(
-					'title' => 'Usage Tracking',
+					'title' => esc_html__( 'Usage Tracking', 'woocommerce' ),
 					'type'  => 'title',
 					'id'    => 'tracking_options',
 					'desc'  => __( 'Gathering usage data allows us to make WooCommerce better — your store will be considered as we evaluate new features, judge the quality of an update, or determine if an improvement makes sense.', 'woocommerce' ),
