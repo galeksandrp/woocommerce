@@ -40,6 +40,14 @@ if ( ! JEST_PUPPETEER_CONFIG ) {
 	testEnvVars.JEST_PUPPETEER_CONFIG = fs.existsSync( localJestConfigFile ) ? localJestConfigFile : jestConfigFile;
 }
 
+// Check for running a specific script
+if ( program.args.length == 1 ) {
+	const testSpec = path.resolve( appPath, program.args[0] );
+	if ( fs.existsSync( testSpec ) ) {
+		process.env.jest_test_spec = testSpec;
+	}
+}
+
 let jestCommand = 'jest';
 const jestArgs = [
 	'--maxWorkers=1',
